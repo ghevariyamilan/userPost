@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,9 +16,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+//    return view('welcome');
+    return redirect('login');
 });
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::middleware(['auth'])->group(function(){
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    /********************************************* Manage Employee ***********************************************/
+    Route::controller(UserController::class)->group(function () {
+        Route::get('user','index')->name('users.index');
+        Route::post('send-welcome-mail','send_welcome_mail');
+    });
+});
