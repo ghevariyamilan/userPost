@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\WelcomeUserMailJob;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\PostCategory;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
@@ -44,6 +47,17 @@ class PostController extends Controller
                     ]);
                 }
             }
+
+            $admin = Cache::get('adminData',null);
+            if ($admin){
+                $admin = User::where('is_admin',1)->first();
+                Cache::put('adminData',$admin,50000);
+            }
+
+            $message['to'] = $admin->email;
+            $message['message'] = $user->first_name." ".$user->last_name."User was Created new email in this blogging site.";
+
+            dispatch(new WelcomeUserMailJob($message));
             return response()->json(['status' => true, 'msg' => 'Success']);
         }
         return response()->json(['status' => false, 'msg' => 'Invalid Request']);
