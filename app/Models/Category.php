@@ -11,5 +11,11 @@ class Category extends Model
 
     protected $table = 'category';
 
+    protected $primaryKey = '_id';
+
     protected $fillable = ['title'];
+
+    function post(){
+        return $this->belongsToMany(Post::class,null,'category_ids', 'post_ids');
+    }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,12 +23,20 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::middleware(['auth'])->group(function(){
+Route::middleware(['auth','userRole'])->group(function(){
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     /********************************************* Manage Employee ***********************************************/
     Route::controller(UserController::class)->group(function () {
         Route::get('user','index')->name('users.index');
         Route::post('send-welcome-mail','send_welcome_mail');
+        Route::get('user-posts/{userId?}','user_post');
+    });
+
+    Route::controller(PostController::class)->group(function () {
+        Route::get('userPost','userPost');
+        Route::post('userPost-store','userPost_store');
     });
 });
+
+Route::get('addPost',[UserController::class,'add_post']);
